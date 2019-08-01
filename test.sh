@@ -16,6 +16,9 @@ ntestes=0
 npassou=0
 program=$1
 
+# Constante de tempo limite
+timelimit=1
+
 # Expressao do SED que significa: substituir .in por .out
 sedexpression='s/\.in/\.out/'
 
@@ -34,7 +37,12 @@ do
 
   # Executa o programa que foi compilado usando o arquivo de teste.in como
   # entrada
-  $program < $t > ./$$.out
+  timeout $timelimit $program < $t > ./$$.out
+
+  # Verifica o tempo limite excedido
+  if [ $? -eq 124 ] && [ $verbose -eq 1 ]; then
+    echo "Teste: $t - Tempo limite excedido"
+  fi
 
   # Verifica se a diferenca entre a saida encontrada e a saida desejada
   # eh uma string de comprimento nao-zero
